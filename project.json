@@ -69,6 +69,54 @@
     "docker-build": {
       "dependsOn": ["build"],
       "command": "docker build -f Dockerfile . -t api"
+    },
+    "worker": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "api:build-worker"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "api:build-worker:development"
+        },
+        "production": {
+          "buildTarget": "api:build-worker:production"
+        }
+      }
+    },
+    "build-worker": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/worker",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "src/worker.ts",
+        "tsConfig": "tsconfig.app.json",
+        "assets": ["src/assets/**/**"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
     }
   },
   "tags": []

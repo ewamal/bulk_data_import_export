@@ -14,6 +14,7 @@ model Article {
   title       String
   description String
   body        String
+  externalId  String?   @unique // Store UUID from import data
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   tagList     Tag[]
@@ -45,6 +46,9 @@ model User {
   email      String    @unique
   username   String    @unique
   password   String
+  role       String?   @default("user")
+  externalId String?   @unique // Store UUID from import data
+  active     Boolean   @default(true)
   image      String?   @default("https://api.realworld.io/images/smiley-cyrus.jpeg")
   bio        String?
   articles   Article[] @relation("UserArticles")
@@ -53,4 +57,59 @@ model User {
   following  User[]    @relation("UserFollows")
   comments   Comment[]
   demo       Boolean   @default(false)
+}
+
+model ImportJob {
+  id             Int           @id @default(autoincrement())
+  idempotencyKey String        @unique
+  resource       String // "users" | "articles" | "comments"
+  status         String        @default("pending") // "pending" | "processing" | "completed" | "failed"
+  totalRecords   Int           @default(0)
+  successCount   Int           @default(0)
+  errorCount     Int           @default(0)
+  skippedCount   Int           @default(0)
+  filePath       String?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  errors         ImportError[]
+
+  @@index([idempotencyKey])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ImportError {
+  id           Int       @id @default(autoincrement())
+  importJobId  Int
+  importJob    ImportJob @relation(fields: [importJobId], references: [id], onDelete: Cascade)
+  recordIndex  Int
+  recordData   Json
+  errorMessage String
+  errorType    String
+  createdAt    DateTime  @default(now())
+
+  @@index([importJobId])
+}
+
+model ExportJob {
+  id             Int       @id @default(autoincrement())
+  idempotencyKey String    @unique
+  resource       String    // "users" | "articles" | "comments"
+  format         String    @default("ndjson") // "ndjson" | "json"
+  status         String    @default("pending") // "pending" | "processing" | "completed" | "failed"
+  totalRecords   Int       @default(0)
+  filePath       String?   // Path to exported file
+  downloadUrl    String?   // URL to download the file
+  filters        Json?     // Export filters
+  fields         Json?     // Fields to include (["id", "title", "body"])
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+
+  @@index([idempotencyKey])
+  @@index([status])
+  @@index([createdAt])
 }

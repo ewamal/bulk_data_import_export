@@ -5,11 +5,15 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "test:jest": "jest",
+    "test:watch": "jest --watch",
+    "worker": "ts-node --transpile-only --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} src/worker.ts",
+    "cleanup-db": "ts-node --transpile-only --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} scripts/cleanup-db.ts"
   },
   "private": true,
   "prisma": {
-    "seed": "ts-node --transpile-only --compiler-options {\"module\":\"CommonJS\"} src/prisma/seed.ts",
+    "seed": "ts-node --transpile-only --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} src/prisma/seed.ts",
     "schema": "src/prisma/schema.prisma"
   },
   "dependencies": {
@@ -18,12 +22,16 @@
     "axios": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "bullmq": "^5.63.0",
     "cors": "^2.8.5",
     "express": "~4.18.1",
     "express-jwt": "^8.4.1",
+    "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
     "slugify": "^1.6.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@nx/esbuild": "17.2.6",
@@ -39,6 +47,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "~4.17.13",
     "@types/jest": "^29.4.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "18.16.9",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@typescript-eslint/parser": "^6.9.1",
