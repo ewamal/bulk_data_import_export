@@ -28,9 +28,6 @@ docker-compose up -d
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your database credentials
 
 # Run database migrations
 npx prisma migrate dev
@@ -45,22 +42,18 @@ npm run worker
 ## Configuration
 
 ### Environment Variables
+
+For local development, create a `.env` file in the project root:
+
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/import_export"
-
-# Server
+DATABASE_URL="postgresql://user:password@localhost:5432/realworld?schema=public"
+NODE_ENV="development"
 PORT=3000
-NODE_ENV=development
-
-# Auth
-JWT_SECRET="your-secret-key"
-
-# Worker Configuration
-POLL_INTERVAL=5000
-MAX_CONCURRENT_JOBS=3
-BATCH_SIZE=1000
 ```
+
+**Note:** 
+- With Docker, these are configured in `docker-compose.yml` and you don't need a `.env` file.
+
 
 ### Docker Compose
 The project includes a `docker-compose.yml` file that sets up:
